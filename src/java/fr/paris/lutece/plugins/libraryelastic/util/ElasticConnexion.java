@@ -45,14 +45,24 @@ public final class ElasticConnexion
     private HttpAccess _clientHttp = new HttpAccess( );
 
     /**
-     * Sent to elastic put.
+     * Send a GET request to Elastic Search server
+     * @param strURI The URI
+     * @return The response
+     * @throws HttpAccessException 
+     */
+    public String GET( String strURI ) throws HttpAccessException
+    {
+        return _clientHttp.doGet( strURI );
+    }
+    /**
+     * Send a PUT request to Elastic Search server
      *
      * @param strURI
      *            the uri
      * @param strJSON
      *            the json
      * @return the string
-     * @throws fr.paris.lutece.util.httpaccess.HttpAccessException
+     * @throws HttpAccessException http access exception
      */
     public String PUT( String strURI, String strJSON ) throws HttpAccessException
     {
@@ -60,7 +70,7 @@ public final class ElasticConnexion
     }
 
     /**
-     * Sent to elastic post.
+     * Send a POST request to Elastic Search server
      *
      * @param strURI
      *            the uri
@@ -76,7 +86,7 @@ public final class ElasticConnexion
     }
 
     /**
-     * Sent to elastic delete.
+     * Send a DELETE request to Elastic Search server
      *
      * @param strURI
      *            the uri

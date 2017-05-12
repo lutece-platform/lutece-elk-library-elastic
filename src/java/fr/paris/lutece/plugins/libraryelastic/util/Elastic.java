@@ -38,6 +38,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.httpaccess.HttpAccessException;
+import fr.paris.lutece.util.httpaccess.HttpAccessStatus;
+import fr.paris.lutece.util.httpaccess.InvalidResponseStatus;
+import org.apache.commons.httpclient.HttpStatus;
 
 /**
  * Elastic
@@ -120,6 +123,34 @@ public class Elastic
             throw new ElasticClientException( "ElasticLibrary : Error deleting index : " + ex.getMessage( ), ex );
         }
         return strResponse;
+    }
+    
+    /**
+     * Check if a given index exists
+     * @param strIndex The index
+     * @return if th index exists
+     * @throws ElasticClientException If a problem occurs connecting Elastic 
+     */
+    public boolean isExists( String strIndex ) throws ElasticClientException
+    {
+        try
+        {
+            String strURI = getURI( strIndex );
+            _connexion.GET( strURI );
+        }
+        catch(  InvalidResponseStatus ex )
+        {
+            if( ex.getResponseStatus() == HttpStatus.SC_NOT_FOUND )
+            {
+                return false;
+            }
+            throw new ElasticClientException( "ElasticLibrary : Error getting index : " + ex.getMessage( ), ex );
+        }
+        catch( HttpAccessException ex )
+        {
+            throw new ElasticClientException( "ElasticLibrary : Error getting index : " + ex.getMessage( ), ex );
+        }
+        return true;
     }
 
     /**
