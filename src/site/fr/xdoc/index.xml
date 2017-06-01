@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <properties>
+        <title>Library Elastic</title>
+    </properties>
+    <body>
+        <section name="Library Elastic">
+            <subsection name="Introduction">
+                <p>
+                    Cette bibliothèque fournit des methodes simples pour adresser des 
+                    requêtes HTTP (GET, POST, ...) à un serveur Elastic Search.
+                </p>
+                <p>
+                    Elle s'appuie sur la bibliothèque LUTECE HttpAccess de manière à profiter
+                    de la configuration partagée du client Http notamment pour passer à travers des proxies.
+                </p>
+            </subsection>
+            <subsection name="Usage">
+                <p>
+                    Voici quelques exemples d'utilisation :
+                </p>
+                <p>
+                    <pre>
+    elastic = new Elastic( strServerUrl );
+    elastic.create( strIndex, strType, object );
+    ...                    
+    elastic.isExists( strIndex );                    
+    elastic.delete( strIndex );
+                        
+    ElasticConnexion ec = new ElasticConnexion();
+    String strResponse = ec.GET( strURI );                                        
+
+                    </pre>
+                </p>
+            </subsection>
+        </section>
+    </body>
+</document>
