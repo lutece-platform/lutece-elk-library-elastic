@@ -33,49 +33,119 @@
  */
 package fr.paris.lutece.plugins.libraryelastic.util;
 
-import fr.paris.lutece.test.LuteceTestCase;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runners.model.InitializationError;
+
+import fr.paris.lutece.plugins.libraryelastic.business.search.BoolQuery;
+import fr.paris.lutece.plugins.libraryelastic.business.search.MatchLeaf;
+import fr.paris.lutece.plugins.libraryelastic.business.search.SearchRequest;
+import fr.paris.lutece.plugins.libraryelastic.business.suggest.CompletionSuggestRequest;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
 /**
  * Elastic Test
  */
-public class ElasticTest extends LuteceTestCase
+public class ElasticTest
 {
     private static final String INDEX = "testlibraryindex";
     private static final String TYPE = "mydoc";
+    private Elastic _elastic;
 
     /**
-     * Test of create method, of class Elastic.
-     *
-     * @throws java.lang.Exception
+     * @throws InitializationError
+     * @throws IOException
+     */
+    public ElasticTest( ) throws InitializationError, IOException
+    {
+        super( );
+        AppPropertiesService.load( getClass( ).getResourceAsStream( "/elastic.properties" ) );
+        this._elastic = new Elastic( AppPropertiesService.getProperty( "elastic.url" ) );
+    }
+
+    @Before
+    public void createIndex( ) throws IOException, ElasticClientException
+    {
+        String strJsonMappings = IOUtils.toString( getClass( ).getResourceAsStream( "/mapping.json" ), StandardCharsets.UTF_8 );
+        _elastic.createMappings( INDEX, strJsonMappings );
+    }
+
+    @After
+    public void deleteIndex( ) throws ElasticClientException
+    {
+        _elastic.deleteIndex( INDEX );
+    }
+
+    /**
+     * Test of create and delete a document, of class Elastic.
+     * 
+     * @throws ElasticClientException
      */
     @Test
-    public void testCreate( ) throws Exception
+    public void testCreateDeleteDocument( ) throws ElasticClientException
     {
         System.out.println( "create" );
-        Object object = new MyDoc( "Hello Elastic !" );
-        Elastic elastic = new Elastic( );
-        String expResult = elastic.create( INDEX, TYPE, object );
+        Object object = new MyDoc( "Hello Elastic !", "Bye" );
+        String expResult = _elastic.create( INDEX, TYPE, "my_id_001", object );
+        System.out.println( expResult );
+        System.out.println( "delete" );
+        expResult = _elastic.deleteDocument( INDEX, TYPE, "my_id_001" );
         System.out.println( expResult );
     }
 
+    /**
+     * Test of search and suggest method, of class Elastic.
+     * 
+     * @throws ElasticClientException
+     * @throws InterruptedException
+     */
     @Test
-    public void testDeleteIndex( ) throws Exception
+    public void testSearchAndSuggest( ) throws ElasticClientException, InterruptedException
     {
-        System.out.println( "delete" );
-        Elastic elastic = new Elastic( );
-        String expResult = elastic.deleteIndex( INDEX );
+        Object object = new MyDoc( "Hello Elastic !", "Bye" );
+        String expResult = _elastic.create( INDEX, TYPE, object );
+        System.out.println( expResult );
+
+        // waiting object creation in ES
+        Thread.sleep( 1000 );
+
+        System.out.println( "search" );
+        SearchRequest search = new SearchRequest( );
+        BoolQuery query = new BoolQuery( );
+        query.addShould( new MatchLeaf( "message", "Hello" ) );
+        search.setSearchQuery( query );
+        expResult = _elastic.search( INDEX, search );
+        System.out.println( expResult );
+
+        System.out.println( "suggest" );
+        CompletionSuggestRequest suggest = new CompletionSuggestRequest( );
+        suggest.setMatchType( "text" );
+        suggest.setMatchValue( "Hello" );
+        expResult = _elastic.suggest( INDEX, suggest );
         System.out.println( expResult );
     }
 
     class MyDoc
     {
-
         private String _strMessage;
+        private String _strNotMessage;
+        private Map<String, String> _mapSuggest;
 
-        MyDoc( String strMessage )
+        MyDoc( String strMessage, String strNotMessage )
         {
             _strMessage = strMessage;
+            _strNotMessage = strNotMessage;
+            _mapSuggest = new HashMap<String, String>( );
+            _mapSuggest.put( "input", _strMessage );
+            // output not managed for ES > 5.0
+            // _mapSuggest.put( "output", "output-"+_strMessage );
         }
 
         /**
@@ -99,6 +169,43 @@ public class ElasticTest extends LuteceTestCase
             _strMessage = strMessage;
         }
 
+        /**
+         * Returns the NotMessage
+         *
+         * @return The NotMessage
+         */
+        public String getNotMessage( )
+        {
+            return _strNotMessage;
+        }
+
+        /**
+         * Sets the NotMessage
+         *
+         * @param strNotMessage
+         *            The NotMessage
+         */
+        public void setNotMessage( String strNotMessage )
+        {
+            _strNotMessage = strNotMessage;
+        }
+
+        /**
+         * @return the mapSuggest
+         */
+        public Map<String, String> getSuggest( )
+        {
+            return _mapSuggest;
+        }
+
+        /**
+         * @param mapSuggest
+         *            the mapSuggest to set
+         */
+        public void setSuggest( Map<String, String> mapSuggest )
+        {
+            this._mapSuggest = mapSuggest;
+        }
     }
 
 }

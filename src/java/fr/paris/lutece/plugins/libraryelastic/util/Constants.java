@@ -41,16 +41,12 @@ public final class Constants
 {
     public static final String PATH_QUERY_SUGGEST = "_suggest";
     public static final String PATH_QUERY_SEARCH = "_search";
-    public static final String PROPERTY_SIZE_SEARCH_PARAM_VALUE = "library-elastic.sizeSearchParamValue";
-    public static final String PROPERTY_ELASTIC_SERVER_URL = "library-elastic.url";
-    public static final String PROPERTY_ELASTIC_PATH = "library-elastic.path";
-    public static final String DEFAULT_SERVER_URL = "http://localhost:9200/";
-    
-    
+    public static final String URL_PATH_SEPARATOR = "/";
+
     /** Private constructor */
-    private Constants()
+    private Constants( )
     {
-        
+
     }
 
 }

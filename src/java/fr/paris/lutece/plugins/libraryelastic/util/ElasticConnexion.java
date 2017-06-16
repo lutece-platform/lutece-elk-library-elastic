@@ -46,14 +46,17 @@ public final class ElasticConnexion
 
     /**
      * Send a GET request to Elastic Search server
-     * @param strURI The URI
+     * 
+     * @param strURI
+     *            The URI
      * @return The response
-     * @throws HttpAccessException 
+     * @throws HttpAccessException
      */
     public String GET( String strURI ) throws HttpAccessException
     {
         return _clientHttp.doGet( strURI );
     }
+
     /**
      * Send a PUT request to Elastic Search server
      *
@@ -62,7 +65,8 @@ public final class ElasticConnexion
      * @param strJSON
      *            the json
      * @return the string
-     * @throws HttpAccessException http access exception
+     * @throws HttpAccessException
+     *             http access exception
      */
     public String PUT( String strURI, String strJSON ) throws HttpAccessException
     {

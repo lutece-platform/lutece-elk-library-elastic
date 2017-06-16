@@ -36,11 +36,14 @@ package fr.paris.lutece.plugins.libraryelastic.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
+
+import fr.paris.lutece.plugins.libraryelastic.business.search.SearchRequest;
+import fr.paris.lutece.plugins.libraryelastic.business.suggest.AbstractSuggestRequest;
 import fr.paris.lutece.util.httpaccess.HttpAccessException;
-import fr.paris.lutece.util.httpaccess.HttpAccessStatus;
 import fr.paris.lutece.util.httpaccess.InvalidResponseStatus;
+
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Elastic
@@ -50,15 +53,6 @@ public class Elastic
     private static ObjectMapper _mapper = new ObjectMapper( );
     private ElasticConnexion _connexion;
     private String _strServerUrl;
-
-    /**
-     * Constructor
-     */
-    public Elastic( )
-    {
-        _strServerUrl = AppPropertiesService.getProperty( Constants.PROPERTY_ELASTIC_SERVER_URL, Constants.DEFAULT_SERVER_URL );
-        _connexion = new ElasticConnexion( );
-    }
 
     /**
      * Constructor
@@ -73,7 +67,7 @@ public class Elastic
     }
 
     /**
-     * Create a document oof given type into a given index
+     * Create a document of given type into a given index
      * 
      * @param strIndex
      *            The index
@@ -87,11 +81,31 @@ public class Elastic
      */
     public String create( String strIndex, String strType, Object object ) throws ElasticClientException
     {
-        String strResponse = "";
+        return create( strIndex, strType, StringUtils.EMPTY, object );
+    }
+
+    /**
+     * Create a document of given type into a given index at the given id
+     * 
+     * @param strIndex
+     *            The index
+     * @param strType
+     *            The document type
+     * @param strId
+     *            The document id
+     * @param object
+     *            The document
+     * @return The JSON response from Elastic
+     * @throws ElasticClientException
+     *             If a problem occurs connecting Elastic
+     */
+    public String create( String strIndex, String strType, String strId, Object object ) throws ElasticClientException
+    {
+        String strResponse = StringUtils.EMPTY;
         try
         {
             String strJSON = _mapper.writeValueAsString( object );
-            String strURI = getURI( strIndex, strType );
+            String strURI = getURI( strIndex, strType ) + strId;
             strResponse = _connexion.POST( strURI, strJSON );
         }
         catch( JsonProcessingException | HttpAccessException ex )
@@ -112,7 +126,7 @@ public class Elastic
      */
     public String deleteIndex( String strIndex ) throws ElasticClientException
     {
-        String strResponse = "";
+        String strResponse = StringUtils.EMPTY;
         try
         {
             String strURI = getURI( strIndex );
@@ -124,12 +138,43 @@ public class Elastic
         }
         return strResponse;
     }
-    
+
+    /**
+     * Delete a document based on its id in the index
+     * 
+     * @param strIndex
+     *            The index
+     * @param strType
+     *            The document type
+     * @param strId
+     *            The id
+     * @return The JSON response from Elastic
+     * @throws ElasticClientException
+     *             If a problem occurs connecting Elastic
+     */
+    public String deleteDocument( String strIndex, String strType, String strId ) throws ElasticClientException
+    {
+        String strResponse = StringUtils.EMPTY;
+        try
+        {
+            String strURI = getURI( strIndex, strType ) + strId;
+            strResponse = _connexion.DELETE( strURI );
+        }
+        catch( HttpAccessException ex )
+        {
+            throw new ElasticClientException( "ElasticLibrary : Error deleting document : " + ex.getMessage( ), ex );
+        }
+        return strResponse;
+    }
+
     /**
      * Check if a given index exists
-     * @param strIndex The index
+     * 
+     * @param strIndex
+     *            The index
      * @return if th index exists
-     * @throws ElasticClientException If a problem occurs connecting Elastic 
+     * @throws ElasticClientException
+     *             If a problem occurs connecting Elastic
      */
     public boolean isExists( String strIndex ) throws ElasticClientException
     {
@@ -138,9 +183,9 @@ public class Elastic
             String strURI = getURI( strIndex );
             _connexion.GET( strURI );
         }
-        catch(  InvalidResponseStatus ex )
+        catch( InvalidResponseStatus ex )
         {
-            if( ex.getResponseStatus() == HttpStatus.SC_NOT_FOUND )
+            if ( ex.getResponseStatus( ) == HttpStatus.SC_NOT_FOUND )
             {
                 return false;
             }
@@ -154,6 +199,60 @@ public class Elastic
     }
 
     /**
+     * Search a document of given type into a given index
+     * 
+     * @param strIndex
+     *            The index
+     * @param search
+     *            search request
+     * @return The JSON response from Elastic
+     * @throws ElasticClientException
+     *             If a problem occurs connecting Elastic
+     */
+    public String search( String strIndex, SearchRequest search ) throws ElasticClientException
+    {
+        String strResponse = StringUtils.EMPTY;
+        try
+        {
+            String strJSON = _mapper.writeValueAsString( search.mapToNode( ) );
+            String strURI = getURI( strIndex ) + Constants.PATH_QUERY_SEARCH;
+            strResponse = _connexion.POST( strURI, strJSON );
+        }
+        catch( JsonProcessingException | HttpAccessException ex )
+        {
+            throw new ElasticClientException( "ElasticLibrary : Error searching object : " + ex.getMessage( ), ex );
+        }
+        return strResponse;
+    }
+
+    /**
+     * suggest a list of document of given type into a given index
+     * 
+     * @param strIndex
+     *            The index
+     * @param suggest
+     *            suggest requet
+     * @return The JSON response from Elastic
+     * @throws ElasticClientException
+     *             If a problem occurs connecting Elastic
+     */
+    public String suggest( String strIndex, AbstractSuggestRequest suggest ) throws ElasticClientException
+    {
+        String strResponse = StringUtils.EMPTY;
+        try
+        {
+            String strJSON = _mapper.writeValueAsString( suggest.mapToNode( ) );
+            String strURI = getURI( strIndex ) + Constants.PATH_QUERY_SUGGEST;
+            strResponse = _connexion.POST( strURI, strJSON );
+        }
+        catch( JsonProcessingException | HttpAccessException ex )
+        {
+            throw new ElasticClientException( "ElasticLibrary : Error suggesting object : " + ex.getMessage( ), ex );
+        }
+        return strResponse;
+    }
+
+    /**
      * 
      * @param strIndex
      * @param strJsonMappings
@@ -162,7 +261,7 @@ public class Elastic
      */
     public String createMappings( String strIndex, String strJsonMappings ) throws ElasticClientException
     {
-        String strResponse = "";
+        String strResponse = StringUtils.EMPTY;
         try
         {
             String strURI = getURI( strIndex );
@@ -170,7 +269,7 @@ public class Elastic
         }
         catch( HttpAccessException ex )
         {
-            throw new ElasticClientException( "ElasticLibrary : Error deleting index : " + ex.getMessage( ), ex );
+            throw new ElasticClientException( "ElasticLibrary : Error creating mappings : " + ex.getMessage( ), ex );
         }
         return strResponse;
 
@@ -199,11 +298,14 @@ public class Elastic
     private String getURI( String strIndex, String strType )
     {
         String strURI = _strServerUrl;
-        strURI = ( strURI.endsWith( "/" ) ) ? strURI : strURI + "/";
-        strURI = strURI + strIndex + "/";
-        if ( strType != null )
+        strURI = ( strURI.endsWith( Constants.URL_PATH_SEPARATOR ) ) ? strURI : strURI + Constants.URL_PATH_SEPARATOR;
+        if ( StringUtils.isNotEmpty( strIndex ) )
         {
-            strURI = strURI + strType + "/";
+            strURI = ( ( strIndex.endsWith( Constants.URL_PATH_SEPARATOR ) ) ? strURI + strIndex : strURI + strIndex + Constants.URL_PATH_SEPARATOR );
+        }
+        if ( StringUtils.isNotEmpty( strType ) )
+        {
+            strURI = ( ( strType.endsWith( Constants.URL_PATH_SEPARATOR ) ) ? strURI + strType : strURI + strType + Constants.URL_PATH_SEPARATOR );
         }
         return strURI;
     }
