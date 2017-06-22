@@ -36,14 +36,47 @@ package fr.paris.lutece.plugins.libraryelastic.business.suggest;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import fr.paris.lutece.plugins.libraryelastic.business.search.AbstractSearchQuery;
+
 /**
- * Abstract for suggest request TODO for 5.4 elasticsearch server, Suggest can be used as a Search query a possibility is to make this class extends
- * AbstractSearchQuery to easily change the suggest request with a search request
+ * Abstract for suggest request
  */
-public abstract class AbstractSuggestRequest
+public abstract class AbstractSuggestRequest extends AbstractSearchQuery
 {
     private String _strMatchType;
     private String _strMatchValue;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getQueryType( )
+    {
+        return "suggest";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getNodeName( )
+    {
+        return "lutece-suggest";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ObjectNode getNodeContent( JsonNodeFactory factory )
+    {
+        ObjectNode query = new ObjectNode( factory );
+
+        query.put( _strMatchType, _strMatchValue );
+        query.set( getSuggestNodeName( ), getSuggestNodeContent( factory ) );
+
+        return query;
+    }
 
     /**
      * @param strMatchType
@@ -73,21 +106,4 @@ public abstract class AbstractSuggestRequest
      * @return JSON node content for serialisation
      */
     protected abstract ObjectNode getSuggestNodeContent( JsonNodeFactory factory );
-
-    /**
-     * @return a JSON ObjectNode which can be use with ObjectMapper
-     */
-    public ObjectNode mapToNode( )
-    {
-        JsonNodeFactory factory = JsonNodeFactory.instance;
-        ObjectNode root = new ObjectNode( factory );
-        ObjectNode query = new ObjectNode( factory );
-
-        query.put( _strMatchType, _strMatchValue );
-        query.set( getSuggestNodeName( ), getSuggestNodeContent( factory ) );
-        root.set( "lutece-suggest", query );
-
-        return root;
-    }
-
 }

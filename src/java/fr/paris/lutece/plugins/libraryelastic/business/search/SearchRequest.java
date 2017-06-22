@@ -86,7 +86,7 @@ public class SearchRequest
         JsonNodeFactory factory = JsonNodeFactory.instance;
         ObjectNode root = new ObjectNode( factory );
         ObjectNode query = _searchQuery.mapToNode( factory );
-        root.set( "query", query );
+        root.set( _searchQuery.getQueryType( ), query );
         if ( _nSize != null )
         {
             root.put( "size", _nSize );

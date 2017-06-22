@@ -38,6 +38,8 @@ import org.junit.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import fr.paris.lutece.plugins.libraryelastic.business.search.SearchRequest;
+
 /**
  * This is a DEV test which test nothing, just output json for control
  */
@@ -54,11 +56,14 @@ public class SuggestRequestTest
         suggest.setMatchType( "strMatchType" );
         suggest.setMatchValue( "strMatchValue" );
 
+        SearchRequest search = new SearchRequest( );
+        search.setSearchQuery( suggest );
+
         System.out.println( "result whithout size" );
-        System.out.println( mapper.writeValueAsString( suggest.mapToNode( ) ) );
+        System.out.println( mapper.writeValueAsString( search.mapToNode( ) ) );
 
         suggest.setSize( 10 );
         System.out.println( "result whith size" );
-        System.out.println( mapper.writeValueAsString( suggest.mapToNode( ) ) );
+        System.out.println( mapper.writeValueAsString( search.mapToNode( ) ) );
     }
 }

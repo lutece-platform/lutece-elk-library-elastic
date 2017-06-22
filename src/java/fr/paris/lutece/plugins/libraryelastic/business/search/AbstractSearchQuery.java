@@ -42,6 +42,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public abstract class AbstractSearchQuery
 {
     /**
+     * return JSON query type
+     */
+    protected String getQueryType( )
+    {
+        return "query";
+    }
+
+    /**
      * @return JSON node name for serialisation
      */
     protected abstract String getNodeName( );

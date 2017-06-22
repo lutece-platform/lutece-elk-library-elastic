@@ -226,12 +226,13 @@ public class Elastic
     }
 
     /**
-     * suggest a list of document of given type into a given index
+     * suggest a list of document of given type into a given index The suggest is done with a _search request with size set to 0 to avoid fetch in 'hits' so be
+     * careful with the JSON result
      * 
      * @param strIndex
      *            The index
      * @param suggest
-     *            suggest requet
+     *            suggest request
      * @return The JSON response from Elastic
      * @throws ElasticClientException
      *             If a problem occurs connecting Elastic
@@ -241,8 +242,11 @@ public class Elastic
         String strResponse = StringUtils.EMPTY;
         try
         {
-            String strJSON = _mapper.writeValueAsString( suggest.mapToNode( ) );
-            String strURI = getURI( strIndex ) + Constants.PATH_QUERY_SUGGEST;
+            SearchRequest search = new SearchRequest( );
+            search.setSize( 0 );
+            search.setSearchQuery( suggest );
+            String strJSON = _mapper.writeValueAsString( search.mapToNode( ) );
+            String strURI = getURI( strIndex ) + Constants.PATH_QUERY_SEARCH;
             strResponse = _connexion.POST( strURI, strJSON );
         }
         catch( JsonProcessingException | HttpAccessException ex )
