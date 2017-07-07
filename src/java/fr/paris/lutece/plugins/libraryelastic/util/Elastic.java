@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.libraryelastic.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.paris.lutece.plugins.libraryelastic.business.bulk.BulkRequest;
 
 import fr.paris.lutece.plugins.libraryelastic.business.search.SearchRequest;
 import fr.paris.lutece.plugins.libraryelastic.business.suggest.AbstractSuggestRequest;
@@ -111,6 +112,30 @@ public class Elastic
         catch( JsonProcessingException | HttpAccessException ex )
         {
             throw new ElasticClientException( "ElasticLibrary : Error creating object : " + ex.getMessage( ), ex );
+        }
+        return strResponse;
+    }
+    
+    /**
+     * perform a bulk indexing of documents : this is used for indexing thousand doc with one HTTP call
+     * @param strIndex the elk index name
+     * @param strType the type of document
+     * @param bulkRequest the bulkRequest
+     * @return the reponse of Elk server
+     * @throws ElasticClientException 
+     */
+    public String createByBulk( String strIndex, String strType, BulkRequest bulkRequest ) throws ElasticClientException
+    {
+        String strResponse = StringUtils.EMPTY;
+        try
+        {
+            String strURI = getURI( strIndex, strType ) + Constants.PATH_QUERY_BULK;
+            String strBulkBody = bulkRequest.getBulkBody( _mapper );
+            strResponse = _connexion.POST( strURI, strBulkBody );
+        }
+        catch( JsonProcessingException | HttpAccessException ex )
+        {
+            throw new ElasticClientException( "ElasticLibrary : Error processing bulking request : " + ex.getMessage( ), ex );
         }
         return strResponse;
     }
