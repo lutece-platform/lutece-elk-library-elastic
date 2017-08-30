@@ -39,16 +39,13 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * Bulk Request class to do bulk operations on Elastic Search with only one request
+ */
 public class BulkRequest
 {
-    Map<AbstractSubRequest,Object> _mapSubAction;
+    private Map<AbstractSubRequest,Object> _mapSubAction = new HashMap<AbstractSubRequest,Object>();
 
-    public BulkRequest()
-    {
-        _mapSubAction = new HashMap<AbstractSubRequest,Object>();
-    }
-    
     /**
      * Set the SubActions map
      * @param mapSubAction  the map of subactions of bulking request
@@ -56,6 +53,16 @@ public class BulkRequest
     public void setMapSubAction( Map<AbstractSubRequest,Object> mapSubAction )
     {
         _mapSubAction = mapSubAction;
+    }
+    
+    /**
+     * Add an entry to the subAction map
+     * @param action The action
+     * @param object The object on which the action will be done
+     */
+    public void addAction( AbstractSubRequest action , Object object )
+    {
+        _mapSubAction.put( action, object );
     }
     
     /**

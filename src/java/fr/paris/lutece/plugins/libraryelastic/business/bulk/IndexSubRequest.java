@@ -35,11 +35,14 @@ package fr.paris.lutece.plugins.libraryelastic.business.bulk;
 
 import fr.paris.lutece.plugins.libraryelastic.util.Constants;
 
+/**
+ * IndexSubRequest class
+ */
 public class IndexSubRequest extends AbstractSubRequest
 {
     /**
      * Constructor for IndexSubRequest
-     * @param strId 
+     * @param strId The document ID or null if no ID
      */
     public IndexSubRequest( String strId )
     {

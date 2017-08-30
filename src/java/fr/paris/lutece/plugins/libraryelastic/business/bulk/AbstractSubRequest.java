@@ -74,7 +74,10 @@ public abstract class AbstractSubRequest
     {
         ObjectNode content = new ObjectNode( factory );
         ObjectNode objId = new ObjectNode( factory );
-        objId.put( Constants.ELK_ID, _strId );
+        if( _strId != null )
+        {
+            objId.put( Constants.ELK_ID, _strId );
+        }
         content.put( _strAction, objId );
         
         return content;
