@@ -42,7 +42,7 @@ public final class Constants
     public static final String PATH_QUERY_SUGGEST = "_suggest";
     public static final String PATH_QUERY_SEARCH = "_search";
     public static final String PATH_QUERY_BULK = "_bulk";
-    
+
     public static final String URL_PATH_SEPARATOR = "/";
     public static final String ELK_ACTION_INDEX = "index";
     public static final String ELK_ID = "_id";

@@ -125,14 +125,18 @@ public class Elastic
         }
         return strResponse;
     }
-    
+
     /**
      * perform a bulk indexing of documents : this is used for indexing thousand doc with one HTTP call
-     * @param strIndex the elk index name
-     * @param strType the type of document
-     * @param bulkRequest the bulkRequest
+     * 
+     * @param strIndex
+     *            the elk index name
+     * @param strType
+     *            the type of document
+     * @param bulkRequest
+     *            the bulkRequest
      * @return the reponse of Elk server
-     * @throws ElasticClientException 
+     * @throws ElasticClientException
      */
     public String createByBulk( String strIndex, String strType, BulkRequest bulkRequest ) throws ElasticClientException
     {

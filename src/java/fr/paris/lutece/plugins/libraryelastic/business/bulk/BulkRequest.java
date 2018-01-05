@@ -44,38 +44,45 @@ import java.util.Map;
  */
 public class BulkRequest
 {
-    private Map<AbstractSubRequest,Object> _mapSubAction = new HashMap<AbstractSubRequest,Object>();
+    private Map<AbstractSubRequest, Object> _mapSubAction = new HashMap<AbstractSubRequest, Object>( );
 
     /**
      * Set the SubActions map
-     * @param mapSubAction  the map of subactions of bulking request
+     * 
+     * @param mapSubAction
+     *            the map of subactions of bulking request
      */
-    public void setMapSubAction( Map<AbstractSubRequest,Object> mapSubAction )
+    public void setMapSubAction( Map<AbstractSubRequest, Object> mapSubAction )
     {
         _mapSubAction = mapSubAction;
     }
-    
+
     /**
      * Add an entry to the subAction map
-     * @param action The action
-     * @param object The object on which the action will be done
+     * 
+     * @param action
+     *            The action
+     * @param object
+     *            The object on which the action will be done
      */
-    public void addAction( AbstractSubRequest action , Object object )
+    public void addAction( AbstractSubRequest action, Object object )
     {
         _mapSubAction.put( action, object );
     }
-    
+
     /**
      * Get body of bulking request
-     * @param mapper the Object Mapper
+     * 
+     * @param mapper
+     *            the Object Mapper
      * @return the body of a bulk request, based on multiple index/create/delete actions
-     * @throws JsonProcessingException 
+     * @throws JsonProcessingException
      */
     public String getBulkBody( ObjectMapper mapper ) throws JsonProcessingException
     {
         StringBuilder builderBulkBody = new StringBuilder( );
-        
-        for (Map.Entry<AbstractSubRequest,Object> entry : _mapSubAction.entrySet( ) )
+
+        for ( Map.Entry<AbstractSubRequest, Object> entry : _mapSubAction.entrySet( ) )
         {
             builderBulkBody.append( entry.getKey( ).getNodeAction( JsonNodeFactory.instance ) );
             builderBulkBody.append( "\n" );
@@ -93,8 +100,8 @@ public class BulkRequest
 
             builderBulkBody.append( "\n" );
         }
-        
+
         return builderBulkBody.toString( );
     }
-    
+
 }

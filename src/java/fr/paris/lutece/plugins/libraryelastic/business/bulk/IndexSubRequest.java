@@ -42,7 +42,9 @@ public class IndexSubRequest extends AbstractSubRequest
 {
     /**
      * Constructor for IndexSubRequest
-     * @param strId The document ID or null if no ID
+     * 
+     * @param strId
+     *            The document ID or null if no ID
      */
     public IndexSubRequest( String strId )
     {

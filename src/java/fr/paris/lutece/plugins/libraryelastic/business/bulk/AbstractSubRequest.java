@@ -46,10 +46,11 @@ public abstract class AbstractSubRequest
     {
         _strId = strId;
     }
-    
+
     /**
      * Set action for subrequest
-     * @param strAction 
+     * 
+     * @param strAction
      */
     protected final void setAction( String strAction )
     {
@@ -58,15 +59,17 @@ public abstract class AbstractSubRequest
 
     /**
      * Set id for subrequest
-     * @param strId 
+     * 
+     * @param strId
      */
     protected final void setId( String strId )
     {
         _strId = strId;
     }
-    
+
     /**
      * Get JSON Node for bulk subrequest
+     * 
      * @param factory
      * @return a JSON Node mappable by ObjectMapper
      */
@@ -74,12 +77,12 @@ public abstract class AbstractSubRequest
     {
         ObjectNode content = new ObjectNode( factory );
         ObjectNode objId = new ObjectNode( factory );
-        if( _strId != null )
+        if ( _strId != null )
         {
             objId.put( Constants.ELK_ID, _strId );
         }
         content.put( _strAction, objId );
-        
+
         return content;
-    }  
+    }
 }
