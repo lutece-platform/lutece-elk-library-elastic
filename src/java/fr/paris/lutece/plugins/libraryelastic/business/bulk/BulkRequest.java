@@ -79,7 +79,18 @@ public class BulkRequest
         {
             builderBulkBody.append( entry.getKey( ).getNodeAction( JsonNodeFactory.instance ) );
             builderBulkBody.append( "\n" );
-            builderBulkBody.append( mapper.writeValueAsString( entry.getValue( ) ) );
+
+            Object object = entry.getValue( );
+
+            if ( object instanceof String )
+            {
+                builderBulkBody.append( (String) object );
+            }
+            else
+            {
+                builderBulkBody.append( mapper.writeValueAsString( object ) );
+            }
+
             builderBulkBody.append( "\n" );
         }
         

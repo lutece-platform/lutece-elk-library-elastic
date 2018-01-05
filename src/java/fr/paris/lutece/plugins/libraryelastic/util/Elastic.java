@@ -105,7 +105,17 @@ public class Elastic
         String strResponse = StringUtils.EMPTY;
         try
         {
-            String strJSON = _mapper.writeValueAsString( object );
+            String strJSON;
+
+            if ( object instanceof String )
+            {
+                strJSON = (String) object;
+            }
+            else
+            {
+                strJSON = _mapper.writeValueAsString( object );
+            }
+
             String strURI = getURI( strIndex, strType ) + strId;
             strResponse = _connexion.POST( strURI, strJSON );
         }
@@ -275,6 +285,33 @@ public class Elastic
             strResponse = _connexion.POST( strURI, strJSON );
         }
         catch( JsonProcessingException | HttpAccessException ex )
+        {
+            throw new ElasticClientException( "ElasticLibrary : Error suggesting object : " + ex.getMessage( ), ex );
+        }
+        return strResponse;
+    }
+
+    /**
+     * suggest a list of document of given type into a given index The suggest is done with a _search request with size set to 0 to avoid fetch in 'hits' so be
+     * careful with the JSON result
+     * 
+     * @param strIndex
+     *            The index
+     * @param strJSON
+     *            suggest request
+     * @return The JSON response from Elastic
+     * @throws ElasticClientException
+     *             If a problem occurs connecting Elastic
+     */
+    public String suggest( String strIndex, String strJSON ) throws ElasticClientException
+    {
+        String strResponse = StringUtils.EMPTY;
+        try
+        {
+            String strURI = getURI( strIndex ) + Constants.PATH_QUERY_SEARCH;
+            strResponse = _connexion.POST( strURI, strJSON );
+        }
+        catch( HttpAccessException ex )
         {
             throw new ElasticClientException( "ElasticLibrary : Error suggesting object : " + ex.getMessage( ), ex );
         }
