@@ -205,6 +205,35 @@ public class Elastic
         }
         return strResponse;
     }
+    
+    /**
+     * Delete a documents by Query
+     * 
+     * @param strIndex
+     *            The index
+     * @param strType
+     *            The document type
+     * @param strQuery
+     *            The Query
+     * @return The JSON response from Elastic
+     * @throws ElasticClientException
+     *             If a problem occurs connecting Elastic
+     */
+    public String deleteByQuery( String strIndex, String strType, String strQuery ) throws ElasticClientException
+    {
+        String strResponse = StringUtils.EMPTY;
+        try
+        {
+            String strURI = getURI( strIndex, strType ) + "_delete_by_query";
+            strResponse = _connexion.POST( strURI, strQuery );
+        }
+        catch( HttpAccessException ex )
+        {
+            throw new ElasticClientException( "ElasticLibrary : Error deleting by query : " + ex.getMessage( ), ex );
+        }
+        return strResponse;
+    }
+    
 
     /**
      * Check if a given index exists
