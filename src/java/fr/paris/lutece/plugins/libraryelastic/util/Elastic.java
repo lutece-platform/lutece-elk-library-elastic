@@ -36,8 +36,8 @@ package fr.paris.lutece.plugins.libraryelastic.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.paris.lutece.plugins.libraryelastic.business.bulk.BulkRequest;
 
+import fr.paris.lutece.plugins.libraryelastic.business.bulk.BulkRequest;
 import fr.paris.lutece.plugins.libraryelastic.business.search.SearchRequest;
 import fr.paris.lutece.plugins.libraryelastic.business.suggest.AbstractSuggestRequest;
 import fr.paris.lutece.util.httpaccess.HttpAccessException;
@@ -224,7 +224,7 @@ public class Elastic
         String strResponse = StringUtils.EMPTY;
         try
         {
-            String strURI = getURI( strIndex, strType ) + "_delete_by_query";
+            String strURI = getURI( strIndex, strType ) + Constants.PATH_QUERY_DELETE_BY_QUERY;
             strResponse = _connexion.POST( strURI, strQuery );
         }
         catch( HttpAccessException ex )
@@ -233,8 +233,49 @@ public class Elastic
         }
         return strResponse;
     }
-    
+    /**
+     * Partial Updates to Documents
+     * @param strIndex
+     *            The index
+     * @param strType
+     *            The document type
+     * @param strId
+     *            The document id
+     * @param object
+     *            The document
+     * @return The JSON response from Elastic
+     * @throws ElasticClientException
+     *             If a problem occurs connecting Elastic
+     */
 
+    public String partialUpdate( String strIndex, String strType, String strId, Object object ) throws ElasticClientException
+    {
+        String strResponse = StringUtils.EMPTY;
+        try
+        {
+        	String strJSON;
+            if ( object instanceof String )
+            {
+                strJSON = (String) object;
+            }
+            else
+            {
+                strJSON = _mapper.writeValueAsString( object );
+            }
+            
+            String json= buildJsonToPartialUpdate(strJSON);
+            
+            String strURI = getURI( strIndex, strType ) + strId+ Constants.URL_PATH_SEPARATOR +Constants.PATH_QUERY_UPDATE;
+            strResponse = _connexion.POST( strURI, json );
+        }
+        catch( JsonProcessingException | HttpAccessException ex )
+        {
+            throw new ElasticClientException( "ElasticLibrary : Error updating by query : " + ex.getMessage( ), ex );
+        }
+        return strResponse;
+    }
+    
+    
     /**
      * Check if a given index exists
      * 
@@ -408,4 +449,18 @@ public class Elastic
         }
         return strURI;
     }
+    /**
+     * Build Json to partial update
+     * @param strJson The json
+     * @return json 
+     */
+    private String buildJsonToPartialUpdate(String strJson ){
+    	
+    	StringBuilder sbuilder = new StringBuilder( );
+    	sbuilder.append("{ \"doc\" : ");
+    	sbuilder.append(strJson);
+    	sbuilder.append("}");
+    	
+    	return sbuilder.toString();
+   }
 }
