@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2017, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,6 @@
  *
  * License 1.0
  */
-
 package fr.paris.lutece.plugins.libraryelastic.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -65,6 +64,22 @@ public class Elastic
     {
         _strServerUrl = strServerUrl;
         _connexion = new ElasticConnexion( );
+    }
+
+    /**
+     * Basic Authentification constructor
+     * 
+     * @param strServerUrl
+     *            The Elastic server URL
+     * @param strServerLogin
+     *            Login
+     * @param strServerPwd
+     *            Password
+     */
+    public Elastic( String strServerUrl, String strServerLogin, String strServerPwd )
+    {
+        _strServerUrl = strServerUrl;
+        _connexion = new ElasticConnexion( strServerLogin, strServerPwd );
     }
 
     /**
@@ -205,7 +220,7 @@ public class Elastic
         }
         return strResponse;
     }
-    
+
     /**
      * Delete a documents by Query
      * 
@@ -233,8 +248,10 @@ public class Elastic
         }
         return strResponse;
     }
+
     /**
      * Partial Updates to Documents
+     * 
      * @param strIndex
      *            The index
      * @param strType
@@ -253,7 +270,7 @@ public class Elastic
         String strResponse = StringUtils.EMPTY;
         try
         {
-        	String strJSON;
+            String strJSON;
             if ( object instanceof String )
             {
                 strJSON = (String) object;
@@ -262,10 +279,10 @@ public class Elastic
             {
                 strJSON = _mapper.writeValueAsString( object );
             }
-            
-            String json= buildJsonToPartialUpdate(strJSON);
-            
-            String strURI = getURI( strIndex, strType ) + strId+ Constants.URL_PATH_SEPARATOR +Constants.PATH_QUERY_UPDATE;
+
+            String json = buildJsonToPartialUpdate( strJSON );
+
+            String strURI = getURI( strIndex, strType ) + strId + Constants.URL_PATH_SEPARATOR + Constants.PATH_QUERY_UPDATE;
             strResponse = _connexion.POST( strURI, json );
         }
         catch( JsonProcessingException | HttpAccessException ex )
@@ -274,8 +291,7 @@ public class Elastic
         }
         return strResponse;
     }
-    
-    
+
     /**
      * Check if a given index exists
      * 
@@ -449,18 +465,22 @@ public class Elastic
         }
         return strURI;
     }
+
     /**
      * Build Json to partial update
-     * @param strJson The json
-     * @return json 
+     * 
+     * @param strJson
+     *            The json
+     * @return json
      */
-    private String buildJsonToPartialUpdate(String strJson ){
-    	
-    	StringBuilder sbuilder = new StringBuilder( );
-    	sbuilder.append("{ \"doc\" : ");
-    	sbuilder.append(strJson);
-    	sbuilder.append("}");
-    	
-    	return sbuilder.toString();
-   }
+    private String buildJsonToPartialUpdate( String strJson )
+    {
+
+        StringBuilder sbuilder = new StringBuilder( );
+        sbuilder.append( "{ \"doc\" : " );
+        sbuilder.append( strJson );
+        sbuilder.append( "}" );
+
+        return sbuilder.toString( );
+    }
 }

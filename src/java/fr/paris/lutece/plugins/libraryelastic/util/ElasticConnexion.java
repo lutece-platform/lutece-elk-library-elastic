@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2017, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,8 @@ package fr.paris.lutece.plugins.libraryelastic.util;
 
 import fr.paris.lutece.util.httpaccess.HttpAccess;
 import fr.paris.lutece.util.httpaccess.HttpAccessException;
+import fr.paris.lutece.util.signrequest.BasicAuthorizationAuthenticator;
+import fr.paris.lutece.util.signrequest.RequestAuthenticator;
 
 /**
  * The Class ElasticConnexion.
@@ -43,6 +45,28 @@ public final class ElasticConnexion
 {
     /** The _client. */
     private HttpAccess _clientHttp = new HttpAccess( );
+    private RequestAuthenticator _authenticator;
+
+    /**
+     * Basic Authentification constructor
+     * 
+     * @param strServerLogin
+     *            Login
+     * @param strServerPwd
+     *            Password
+     */
+    public ElasticConnexion( String strLogin, String strPassword )
+    {
+        _authenticator = getAuthenticator( strLogin, strPassword );
+
+    }
+
+    /**
+     * Constructor
+     */
+    public ElasticConnexion( )
+    {
+    }
 
     /**
      * Send a GET request to Elastic Search server
@@ -54,7 +78,8 @@ public final class ElasticConnexion
      */
     public String GET( String strURI ) throws HttpAccessException
     {
-        return _clientHttp.doGet( strURI );
+        return _clientHttp.doGet( strURI, _authenticator, null );
+
     }
 
     /**
@@ -70,7 +95,7 @@ public final class ElasticConnexion
      */
     public String PUT( String strURI, String strJSON ) throws HttpAccessException
     {
-        return _clientHttp.doPutJSON( strURI, strJSON, null, null );
+        return _clientHttp.doPutJSON( strURI, strJSON, _authenticator, null, null, null );
     }
 
     /**
@@ -86,7 +111,7 @@ public final class ElasticConnexion
      */
     public String POST( String strURI, String strJSON ) throws HttpAccessException
     {
-        return _clientHttp.doPostJSON( strURI, strJSON, null, null );
+        return _clientHttp.doPostJSON( strURI, strJSON, _authenticator, null, null, null );
     }
 
     /**
@@ -100,7 +125,21 @@ public final class ElasticConnexion
      */
     public String DELETE( String strURI ) throws HttpAccessException
     {
-        return _clientHttp.doDelete( strURI, null, null, null, null );
+        return _clientHttp.doDelete( strURI, _authenticator, null, null, null );
+    }
+
+    /**
+     * Build an authenticathor to access the site repository.
+     *
+     * @param strLogin
+     *            the str login
+     * @param strPassword
+     *            the str password
+     * @return The authenticator
+     */
+    private static RequestAuthenticator getAuthenticator( String strLogin, String strPassword )
+    {
+        return new BasicAuthorizationAuthenticator( strLogin, strPassword );
     }
 
 }
