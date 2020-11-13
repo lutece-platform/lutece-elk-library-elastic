@@ -15,7 +15,7 @@ Here is some use samples :
 ```
 
     elastic = new Elastic( strServerUrl );
-    elastic.create( strIndex, strType, object );
+    elastic.create( strIndex, object );
     ...                    
     elastic.isExists( strIndex );                    
     elastic.delete( strIndex );

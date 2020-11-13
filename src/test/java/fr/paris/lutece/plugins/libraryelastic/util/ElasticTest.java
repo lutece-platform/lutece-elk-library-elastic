@@ -93,10 +93,10 @@ public class ElasticTest
     {
         System.out.println( "create" );
         Object object = new MyDoc( "Hello Elastic !", "Bye" );
-        String expResult = _elastic.create( INDEX, TYPE, "my_id_001", object );
+        String expResult = _elastic.create( INDEX, "my_id_001", object );
         System.out.println( expResult );
         System.out.println( "delete" );
-        expResult = _elastic.deleteDocument( INDEX, TYPE, "my_id_001" );
+        expResult = _elastic.deleteDocument( INDEX, "my_id_001" );
         System.out.println( expResult );
     }
 
@@ -110,7 +110,7 @@ public class ElasticTest
     public void testSearchAndSuggest( ) throws ElasticClientException, InterruptedException
     {
         Object object = new MyDoc( "Hello Elastic !", "Bye" );
-        String expResult = _elastic.create( INDEX, TYPE, object );
+        String expResult = _elastic.create( INDEX, object );
         System.out.println( expResult );
 
         // waiting object creation in ES

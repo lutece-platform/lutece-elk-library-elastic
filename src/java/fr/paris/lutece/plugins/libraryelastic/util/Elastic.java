@@ -87,17 +87,15 @@ public class Elastic
      * 
      * @param strIndex
      *            The index
-     * @param strType
-     *            The document type
      * @param object
      *            The document
      * @return The JSON response from Elastic
      * @throws ElasticClientException
      *             If a problem occurs connecting Elastic
      */
-    public String create( String strIndex, String strType, Object object ) throws ElasticClientException
+    public String create( String strIndex, Object object ) throws ElasticClientException
     {
-        return create( strIndex, strType, StringUtils.EMPTY, object );
+        return create( strIndex, StringUtils.EMPTY, object );
     }
 
     /**
@@ -105,8 +103,6 @@ public class Elastic
      * 
      * @param strIndex
      *            The index
-     * @param strType
-     *            The document type
      * @param strId
      *            The document id
      * @param object
@@ -115,7 +111,7 @@ public class Elastic
      * @throws ElasticClientException
      *             If a problem occurs connecting Elastic
      */
-    public String create( String strIndex, String strType, String strId, Object object ) throws ElasticClientException
+    public String create( String strIndex, String strId, Object object ) throws ElasticClientException
     {
         String strResponse = StringUtils.EMPTY;
         try
@@ -131,7 +127,7 @@ public class Elastic
                 strJSON = _mapper.writeValueAsString( object );
             }
 
-            String strURI = getURI( strIndex, strType ) + strId;
+            String strURI = getURI( strIndex ) + strId;
             strResponse = _connexion.POST( strURI, strJSON );
         }
         catch( JsonProcessingException | HttpAccessException ex )
@@ -146,19 +142,17 @@ public class Elastic
      * 
      * @param strIndex
      *            the elk index name
-     * @param strType
-     *            the type of document
      * @param bulkRequest
      *            the bulkRequest
      * @return the reponse of Elk server
      * @throws ElasticClientException
      */
-    public String createByBulk( String strIndex, String strType, BulkRequest bulkRequest ) throws ElasticClientException
+    public String createByBulk( String strIndex, BulkRequest bulkRequest ) throws ElasticClientException
     {
         String strResponse = StringUtils.EMPTY;
         try
         {
-            String strURI = getURI( strIndex, strType ) + Constants.PATH_QUERY_BULK;
+            String strURI = getURI( strIndex ) + Constants.PATH_QUERY_BULK;
             String strBulkBody = bulkRequest.getBulkBody( _mapper );
             strResponse = _connexion.POST( strURI, strBulkBody );
         }
@@ -198,20 +192,18 @@ public class Elastic
      * 
      * @param strIndex
      *            The index
-     * @param strType
-     *            The document type
      * @param strId
      *            The id
      * @return The JSON response from Elastic
      * @throws ElasticClientException
      *             If a problem occurs connecting Elastic
      */
-    public String deleteDocument( String strIndex, String strType, String strId ) throws ElasticClientException
+    public String deleteDocument( String strIndex, String strId ) throws ElasticClientException
     {
         String strResponse = StringUtils.EMPTY;
         try
         {
-            String strURI = getURI( strIndex, strType ) + strId;
+            String strURI = getURI( strIndex ) + strId;
             strResponse = _connexion.DELETE( strURI );
         }
         catch( HttpAccessException ex )
@@ -226,20 +218,18 @@ public class Elastic
      * 
      * @param strIndex
      *            The index
-     * @param strType
-     *            The document type
      * @param strQuery
      *            The Query
      * @return The JSON response from Elastic
      * @throws ElasticClientException
      *             If a problem occurs connecting Elastic
      */
-    public String deleteByQuery( String strIndex, String strType, String strQuery ) throws ElasticClientException
+    public String deleteByQuery( String strIndex, String strQuery ) throws ElasticClientException
     {
         String strResponse = StringUtils.EMPTY;
         try
         {
-            String strURI = getURI( strIndex, strType ) + Constants.PATH_QUERY_DELETE_BY_QUERY;
+            String strURI = getURI( strIndex ) + Constants.PATH_QUERY_DELETE_BY_QUERY;
             strResponse = _connexion.POST( strURI, strQuery );
         }
         catch( HttpAccessException ex )
@@ -254,8 +244,6 @@ public class Elastic
      * 
      * @param strIndex
      *            The index
-     * @param strType
-     *            The document type
      * @param strId
      *            The document id
      * @param object
@@ -265,7 +253,7 @@ public class Elastic
      *             If a problem occurs connecting Elastic
      */
 
-    public String partialUpdate( String strIndex, String strType, String strId, Object object ) throws ElasticClientException
+    public String partialUpdate( String strIndex, String strId, Object object ) throws ElasticClientException
     {
         String strResponse = StringUtils.EMPTY;
         try
@@ -282,7 +270,7 @@ public class Elastic
 
             String json = buildJsonToPartialUpdate( strJSON );
 
-            String strURI = getURI( strIndex, strType ) + strId + Constants.URL_PATH_SEPARATOR + Constants.PATH_QUERY_UPDATE;
+            String strURI = getURI( strIndex ) + strId + Constants.URL_PATH_SEPARATOR + Constants.PATH_QUERY_UPDATE;
             strResponse = _connexion.POST( strURI, json );
         }
         catch( JsonProcessingException | HttpAccessException ex )
@@ -435,23 +423,10 @@ public class Elastic
      * Build the URI of a given index
      * 
      * @param strIndex
+     *            The index name
      * @return The URI
      */
     private String getURI( String strIndex )
-    {
-        return getURI( strIndex, null );
-    }
-
-    /**
-     * Build the URI of a given index
-     * 
-     * @param strIndex
-     *            The index name
-     * @param strType
-     *            The document type
-     * @return The URI
-     */
-    private String getURI( String strIndex, String strType )
     {
         String strURI = _strServerUrl;
         strURI = ( strURI.endsWith( Constants.URL_PATH_SEPARATOR ) ) ? strURI : strURI + Constants.URL_PATH_SEPARATOR;
@@ -459,10 +434,7 @@ public class Elastic
         {
             strURI = ( ( strIndex.endsWith( Constants.URL_PATH_SEPARATOR ) ) ? strURI + strIndex : strURI + strIndex + Constants.URL_PATH_SEPARATOR );
         }
-        if ( StringUtils.isNotEmpty( strType ) )
-        {
-            strURI = ( ( strType.endsWith( Constants.URL_PATH_SEPARATOR ) ) ? strURI + strType : strURI + strType + Constants.URL_PATH_SEPARATOR );
-        }
+
         return strURI;
     }
 
