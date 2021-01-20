@@ -9,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>library-elastic</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.8-SNAPSHOT</version>
     <name>Lutece elastic library</name>
     <packaging>jar</packaging>
     <description>elastic client library</description>
@@ -57,7 +57,7 @@
         <connection>scm:git:https://github.com/lutece-platform/lutece-elk-library-elastic.git</connection>
         <developerConnection>scm:git:https://github.com/lutece-platform/lutece-elk-library-elastic.git</developerConnection>
         <url>https://github.com/lutece-platform/lutece-elk-library-elastic.git</url>
-      <tag>library-elastic-1.0.7</tag>
+      <tag>HEAD</tag>
   </scm>
 
 </project>
