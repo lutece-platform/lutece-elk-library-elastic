@@ -339,6 +339,32 @@ public class Elastic
     }
 
     /**
+     * Search
+     * 
+     * @param strIndex
+     *            The index
+     * @param strSearchRequest
+     *            search request
+     * @return The JSON response from Elastic
+     * @throws ElasticClientException
+     *             If a problem occurs connecting Elastic
+     */
+    public String search( String strIndex, String searchRequest ) throws ElasticClientException
+    {
+        String strResponse = StringUtils.EMPTY;
+        try
+        {
+            String strURI = getURI( strIndex ) + Constants.PATH_QUERY_SEARCH;
+            strResponse = _connexion.POST( strURI, searchRequest );
+        }
+        catch( HttpAccessException ex )
+        {
+            throw new ElasticClientException( "ElasticLibrary : Error searching object : " + ex.getMessage( ), ex );
+        }
+        return strResponse;
+    }
+
+    /**
      * suggest a list of document of given type into a given index The suggest is done with a _search request with size set to 0 to avoid fetch in 'hits' so be
      * careful with the JSON result
      * 
