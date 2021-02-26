@@ -203,7 +203,7 @@ public class Elastic
         String strResponse = StringUtils.EMPTY;
         try
         {
-            String strURI = getURI( strIndex ) + strId;
+            String strURI = getURI( strIndex )  + "_doc" + Constants.URL_PATH_SEPARATOR + strId;
             strResponse = _connexion.DELETE( strURI );
         }
         catch( HttpAccessException ex )
