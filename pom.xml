@@ -35,15 +35,9 @@
 	
     <dependencies>
         <dependency>
-            <groupId>fr.paris.lutece</groupId>
-            <artifactId>lutece-core</artifactId>
-            <version>[5.0.0,)</version>
-            <type>lutece-core</type>
-        </dependency>
-        <dependency>
             <groupId>fr.paris.lutece.plugins</groupId>
             <artifactId>library-httpaccess</artifactId>
-            <version>[2.4.4-SNAPSHOT,)</version>
+            <version>[2.4.4,2.5.3]</version>
             <type>jar</type>
         </dependency>
     </dependencies>
