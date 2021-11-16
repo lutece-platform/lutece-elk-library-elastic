@@ -43,7 +43,7 @@ import fr.paris.lutece.util.httpaccess.HttpAccessException;
 import fr.paris.lutece.util.httpaccess.InvalidResponseStatus;
 
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Elastic
