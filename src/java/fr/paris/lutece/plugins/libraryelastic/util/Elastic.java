@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.libraryelastic.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import fr.paris.lutece.plugins.libraryelastic.business.bulk.BulkRequest;
 import fr.paris.lutece.plugins.libraryelastic.business.search.SearchRequest;
@@ -42,15 +43,15 @@ import fr.paris.lutece.plugins.libraryelastic.business.suggest.AbstractSuggestRe
 import fr.paris.lutece.util.httpaccess.HttpAccessException;
 import fr.paris.lutece.util.httpaccess.InvalidResponseStatus;
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.core5.http.HttpStatus;
 
 /**
  * Elastic
  */
 public class Elastic
 {
-    private static ObjectMapper _mapper = new ObjectMapper( );
+    private static ObjectMapper _mapper = new ObjectMapper( ).registerModule( new JavaTimeModule( ) );
     private ElasticConnexion _connexion;
     private String _strServerUrl;
 
