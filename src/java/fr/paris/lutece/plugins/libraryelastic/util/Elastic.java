@@ -271,7 +271,7 @@ public class Elastic
 
             String json = buildJsonToPartialUpdate( strJSON );
 
-            String strURI = getURI( strIndex ) + "_doc" + Constants.URL_PATH_SEPARATOR + strId + Constants.URL_PATH_SEPARATOR + Constants.PATH_QUERY_UPDATE;
+            String strURI = getURI( strIndex ) + Constants.PATH_QUERY_UPDATE + Constants.URL_PATH_SEPARATOR + strId;
             strResponse = _connexion.POST( strURI, json );
         }
         catch( JsonProcessingException | HttpAccessException ex )
