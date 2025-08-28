@@ -81,7 +81,7 @@ public abstract class AbstractSubRequest
         {
             objId.put( Constants.ELK_ID, _strId );
         }
-        content.put( _strAction, objId );
+        content.replace( _strAction, objId );
 
         return content;
     }

@@ -1,18 +1,15 @@
 {
     "mappings": {
-        "mydoc": {
-            "dynamic": true,
-            "properties": {
-                "message": {
-                    "type": "string"                
-                },
-                "not_message": {
-                    "index": "not_analyzed",
-                    "type": "string"
-                },
-                "suggest": {
-                    "type": "completion"
-                }
+        "dynamic": true,
+        "properties": {
+            "message": {
+                "type": "text"                
+            },
+            "not_message": {
+                "type": "keyword"
+            },
+            "suggest": {
+                "type": "completion"
             }
         }
     }

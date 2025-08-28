@@ -36,8 +36,6 @@ package fr.paris.lutece.plugins.libraryelastic.business.search;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -150,7 +148,7 @@ public class BoolQuery extends AbstractSearchQuery
     {
         ObjectNode content = new ObjectNode( factory );
 
-        if ( CollectionUtils.isNotEmpty( _listMust ) )
+        if ( _listMust != null &&  !_listMust.isEmpty( ) )
         {
             JsonNode must;
             if ( _listMust.size( ) == 1 )
@@ -168,7 +166,7 @@ public class BoolQuery extends AbstractSearchQuery
             content.set( "must", must );
         }
 
-        if ( CollectionUtils.isNotEmpty( _listFilter ) )
+        if ( _listFilter != null &&  !_listFilter.isEmpty( ) )
         {
             JsonNode filter;
             if ( _listFilter.size( ) == 1 )
@@ -186,7 +184,7 @@ public class BoolQuery extends AbstractSearchQuery
             content.set( "filter", filter );
         }
 
-        if ( CollectionUtils.isNotEmpty( _listShould ) )
+        if ( _listShould != null &&  !_listShould.isEmpty( ) )
         {
             JsonNode should;
             if ( _listShould.size( ) == 1 )
@@ -204,7 +202,7 @@ public class BoolQuery extends AbstractSearchQuery
             content.set( "should", should );
         }
 
-        if ( CollectionUtils.isNotEmpty( _listMustNot ) )
+        if ( _listMustNot != null &&  !_listMustNot.isEmpty( ) )
         {
             JsonNode mustNot;
             if ( _listMustNot.size( ) == 1 )

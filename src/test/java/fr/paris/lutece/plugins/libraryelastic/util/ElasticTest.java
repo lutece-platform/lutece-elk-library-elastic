@@ -39,10 +39,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runners.model.InitializationError;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 
 import fr.paris.lutece.plugins.libraryelastic.business.search.BoolQuery;
 import fr.paris.lutece.plugins.libraryelastic.business.search.MatchLeaf;
@@ -53,31 +55,27 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
 /**
  * Elastic Test
  */
+@TestInstance( Lifecycle.PER_CLASS )
 public class ElasticTest
 {
     private static final String INDEX = "testlibraryindex";
-    private static final String TYPE = "mydoc";
     private Elastic _elastic;
 
-    /**
-     * @throws InitializationError
-     * @throws IOException
-     */
-    public ElasticTest( ) throws InitializationError, IOException
+    @BeforeAll
+    public void setUp( ) throws Exception
     {
-        super( );
         AppPropertiesService.load( getClass( ).getResourceAsStream( "/elastic.properties" ) );
         this._elastic = new Elastic( AppPropertiesService.getProperty( "elastic.url" ) );
     }
 
-    @Before
+    @BeforeEach
     public void createIndex( ) throws IOException, ElasticClientException
     {
         String strJsonMappings = IOUtils.toString( getClass( ).getResourceAsStream( "/mapping.json" ), StandardCharsets.UTF_8 );
         _elastic.createMappings( INDEX, strJsonMappings );
     }
 
-    @After
+    @AfterEach
     public void deleteIndex( ) throws ElasticClientException
     {
         _elastic.deleteIndex( INDEX );
