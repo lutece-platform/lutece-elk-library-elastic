@@ -33,16 +33,20 @@
  */
 package fr.paris.lutece.plugins.libraryelastic.util;
 
-import fr.paris.lutece.portal.service.util.AppLogService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * ElasticClientException
  */
 public class ElasticClientException extends Exception
 {
+	private static final String LOGGER = "lutece.application";
+	private static final Logger _logger = LogManager.getLogger( LOGGER );
+
     public ElasticClientException( String strMessage, Throwable exception )
     {
         super( strMessage, exception );
-        AppLogService.error( strMessage, exception );
+        _logger.error( strMessage, exception );
     }
 }

@@ -42,7 +42,7 @@ import java.util.Properties;
  */
 public final class AppPropertiesService
 {
-    private final static Properties _props = new Properties( );
+    private static final Properties _props = new Properties( );
 
     /**
      * Private constructor
