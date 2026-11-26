@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.libraryelastic.util;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -54,6 +55,9 @@ public class Elastic
     private static ObjectMapper _mapper = new ObjectMapper( ).registerModule( new JavaTimeModule( ) );
     private ElasticConnexion _connexion;
     private String _strServerUrl;
+
+    private static final int DELETE_BY_QUERY_MAX_PASSES = 3;
+    private static final long DELETE_BY_QUERY_PAUSE_MS = 200;
 
     /**
      * Constructor
@@ -227,17 +231,71 @@ public class Elastic
      */
     public String deleteByQuery( String strIndex, String strQuery ) throws ElasticClientException
     {
+        // conflicts=proceed: a document written by a concurrent indexing no longer aborts the whole request (409),
+        // it is counted in version_conflicts and deleted by the next pass; refresh=true so that the next pass sees it
+        String strURI = getURI( strIndex ) + Constants.PATH_QUERY_DELETE_BY_QUERY + Constants.PARAMS_DELETE_BY_QUERY;
         String strResponse = StringUtils.EMPTY;
+        long lConflicts = 0;
+        for ( int nPass = 1; nPass <= DELETE_BY_QUERY_MAX_PASSES; nPass++ )
+        {
+            try
+            {
+                strResponse = _connexion.POST( strURI, strQuery );
+            }
+            catch( HttpAccessException ex )
+            {
+                throw new ElasticClientException( "ElasticLibrary : Error deleting by query : " + ex.getMessage( ), ex );
+            }
+            lConflicts = getVersionConflicts( strResponse );
+            if ( lConflicts == 0 )
+            {
+                return strResponse;
+            }
+            pauseBeforeNextPass( nPass );
+        }
+        throw new ElasticClientException( "ElasticLibrary : Error deleting by query : " + lConflicts + " document(s) still in version_conflicts after "
+                + DELETE_BY_QUERY_MAX_PASSES + " passes : " + strResponse, null );
+    }
+
+    /**
+     * Leaves a concurrent indexing the time to finish its writes before the next _delete_by_query pass
+     *
+     * @param nPass
+     *            the pass just done
+     */
+    private static void pauseBeforeNextPass( int nPass )
+    {
+        if ( nPass < DELETE_BY_QUERY_MAX_PASSES )
+        {
+            try
+            {
+                Thread.sleep( DELETE_BY_QUERY_PAUSE_MS * nPass );
+            }
+            catch( InterruptedException e )
+            {
+                Thread.currentThread( ).interrupt( );
+            }
+        }
+    }
+
+    /**
+     * Number of documents a _delete_by_query could not delete because they were modified meanwhile
+     *
+     * @param strResponse
+     *            the JSON response of _delete_by_query
+     * @return the value of version_conflicts, 0 when absent or unreadable
+     */
+    private static long getVersionConflicts( String strResponse )
+    {
         try
         {
-            String strURI = getURI( strIndex ) + Constants.PATH_QUERY_DELETE_BY_QUERY;
-            strResponse = _connexion.POST( strURI, strQuery );
+            JsonNode node = new ObjectMapper( ).readTree( strResponse );
+            return ( node != null ) ? node.path( "version_conflicts" ).asLong( 0 ) : 0;
         }
-        catch( HttpAccessException ex )
+        catch( JsonProcessingException e )
         {
-            throw new ElasticClientException( "ElasticLibrary : Error deleting by query : " + ex.getMessage( ), ex );
+            return 0;
         }
-        return strResponse;
     }
 
     /**
